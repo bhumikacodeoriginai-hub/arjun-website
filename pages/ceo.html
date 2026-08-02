@@ -85,15 +85,33 @@
                         <!-- Photo Slider -->
                         <div class="ceo-photo-slider" id="ceoPhotoSlider">
                             <div class="ceo-slide active">
-                                <img src="../assets/profilepic.jpeg" alt="Arjun N - Founder & CEO of Arjun Realty" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+                                <img src="../assets/profilepic.jpeg" alt="Arjun N - Founder & CEO of Arjun Realty" loading="eager">
+                                <div class="ceo-photo-badge">
+                                    <span>Founder & CEO</span>
+                                </div>
                             </div>
                             <div class="ceo-slide">
-                                <img src="../assets/profilepic2.jpg" alt="Arjun N - CEO Arjun Realty" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+                                <img src="../assets/profilepic2.jpg" alt="Arjun N - Executive Leadership" loading="eager">
+                                <div class="ceo-photo-badge">
+                                    <span>Executive Leadership</span>
+                                </div>
                             </div>
                             <div class="ceo-slide">
-                                <img src="../assets/profilepic3.jpg" alt="Arjun N - Arjun Realty Dubai" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+                                <img src="../assets/profilepic3.jpg" alt="Arjun N - Dubai Operations" loading="eager">
+                                <div class="ceo-photo-badge">
+                                    <span>Dubai Headquarters</span>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Slider Prev / Next Arrows -->
+                        <button class="ceo-slider-arrow prev" id="ceoSlidePrev" aria-label="Previous Photo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <button class="ceo-slider-arrow next" id="ceoSlideNext" aria-label="Next Photo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+
                         <!-- Dot indicators -->
                         <div class="ceo-slider-dots">
                             <button class="ceo-dot active" data-slide="0" aria-label="Photo 1"></button>
@@ -102,6 +120,22 @@
                         </div>
                         <div class="frame-accent-top"></div>
                         <div class="frame-accent-bottom"></div>
+                    </div>
+
+                    <!-- 3-Photo Interactive Thumbnails Row (Always visible and accessible on mobile/iOS) -->
+                    <div class="ceo-thumbnails-row" id="ceoThumbnails" role="tablist" aria-label="Leadership Photos">
+                        <button class="ceo-thumb-btn active" data-slide="0" role="tab" aria-selected="true" aria-label="View Profile Photo 1">
+                            <img src="../assets/profilepic.jpeg" alt="Arjun N - Photo 1">
+                            <span class="thumb-label">Photo 1</span>
+                        </button>
+                        <button class="ceo-thumb-btn" data-slide="1" role="tab" aria-selected="false" aria-label="View Profile Photo 2">
+                            <img src="../assets/profilepic2.jpg" alt="Arjun N - Photo 2">
+                            <span class="thumb-label">Photo 2</span>
+                        </button>
+                        <button class="ceo-thumb-btn" data-slide="2" role="tab" aria-selected="false" aria-label="View Profile Photo 3">
+                            <img src="../assets/profilepic3.jpg" alt="Arjun N - Photo 3">
+                            <span class="thumb-label">Photo 3</span>
+                        </button>
                     </div>
                     <div class="ceo-image-accent"></div>
                 </div>
@@ -291,32 +325,128 @@
     <script src="../assets/js/animations.js" defer></script>
     <script src="../assets/js/ceo-scene.js" defer></script>
 
-    <!-- CEO Photo Slider Script -->
+    <!-- CEO Photo Slider Script - Touch & Swipe Enabled for iOS/Android -->
     <script>
     (function() {
-        var slides = document.querySelectorAll('.ceo-slide');
-        var dots   = document.querySelectorAll('.ceo-dot');
-        var current = 0;
-        var timer;
+        var sliderFrame = document.querySelector('.ceo-image-frame');
+        var slides      = document.querySelectorAll('.ceo-slide');
+        var dots        = document.querySelectorAll('.ceo-dot');
+        var thumbs      = document.querySelectorAll('.ceo-thumb-btn');
+        var prevBtn     = document.getElementById('ceoSlidePrev');
+        var nextBtn     = document.getElementById('ceoSlideNext');
+        var current     = 0;
+        var timer       = null;
 
         function goTo(idx) {
+            if (slides.length === 0) return;
+            
+            // Remove active classes
             slides[current].classList.remove('active');
-            dots[current].classList.remove('active');
+            if (dots[current]) dots[current].classList.remove('active');
+            if (thumbs[current]) {
+                thumbs[current].classList.remove('active');
+                thumbs[current].setAttribute('aria-selected', 'false');
+            }
+            
+            // Set new index
             current = (idx + slides.length) % slides.length;
+            
+            // Add active classes
             slides[current].classList.add('active');
-            dots[current].classList.add('active');
+            if (dots[current]) dots[current].classList.add('active');
+            if (thumbs[current]) {
+                thumbs[current].classList.add('active');
+                thumbs[current].setAttribute('aria-selected', 'true');
+            }
         }
 
         function autoPlay() {
-            timer = setInterval(function() { goTo(current + 1); }, 4000);
+            clearInterval(timer);
+            timer = setInterval(function() {
+                goTo(current + 1);
+            }, 4500);
         }
 
+        // Dot Navigation
         dots.forEach(function(dot, i) {
-            dot.addEventListener('click', function() {
-                clearInterval(timer);
+            dot.addEventListener('click', function(e) {
+                e.preventDefault();
                 goTo(i);
                 autoPlay();
             });
+        });
+
+        // Thumbnail Navigation
+        thumbs.forEach(function(thumb, i) {
+            thumb.addEventListener('click', function(e) {
+                e.preventDefault();
+                goTo(i);
+                autoPlay();
+            });
+        });
+
+        // Prev / Next Arrows
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                goTo(current - 1);
+                autoPlay();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                goTo(current + 1);
+                autoPlay();
+            });
+        }
+
+        // Touch Swipe Support for Mobile & iOS Devices
+        if (sliderFrame) {
+            var startX = 0;
+            var startY = 0;
+            var distX = 0;
+            var distY = 0;
+            var threshold = 40; // minimum swipe distance
+
+            sliderFrame.addEventListener('touchstart', function(e) {
+                var touch = e.touches[0] || e.changedTouches[0];
+                startX = touch.pageX;
+                startY = touch.pageY;
+                distX = 0;
+                distY = 0;
+            }, { passive: true });
+
+            sliderFrame.addEventListener('touchmove', function(e) {
+                if (!e.touches.length) return;
+                var touch = e.touches[0];
+                distX = touch.pageX - startX;
+                distY = touch.pageY - startY;
+            }, { passive: true });
+
+            sliderFrame.addEventListener('touchend', function(e) {
+                // If horizontal movement is greater than vertical movement and exceeds threshold
+                if (Math.abs(distX) > Math.abs(distY) && Math.abs(distX) > threshold) {
+                    if (distX < 0) {
+                        goTo(current + 1); // Swipe left -> Next
+                    } else {
+                        goTo(current - 1); // Swipe right -> Prev
+                    }
+                    autoPlay();
+                }
+            }, { passive: true });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                goTo(current - 1);
+                autoPlay();
+            } else if (e.key === 'ArrowRight') {
+                goTo(current + 1);
+                autoPlay();
+            }
         });
 
         autoPlay();
