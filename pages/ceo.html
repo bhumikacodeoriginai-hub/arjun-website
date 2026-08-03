@@ -85,22 +85,13 @@
                         <!-- Photo Slider -->
                         <div class="ceo-photo-slider" id="ceoPhotoSlider">
                             <div class="ceo-slide active">
-                                <img src="../assets/profilepic.jpeg" alt="Arjun N - Founder & CEO of Arjun Realty" loading="eager">
-                                <div class="ceo-photo-badge">
-                                    <span>Founder & CEO</span>
-                                </div>
+                                <img src="../assets/profilepic.jpeg" alt="Arjun N" loading="eager">
                             </div>
                             <div class="ceo-slide">
-                                <img src="../assets/profilepic2.jpg" alt="Arjun N - Executive Leadership" loading="eager">
-                                <div class="ceo-photo-badge">
-                                    <span>Executive Leadership</span>
-                                </div>
+                                <img src="../assets/profilepic2.jpg" alt="Arjun N" loading="eager">
                             </div>
                             <div class="ceo-slide">
-                                <img src="../assets/profilepic3.jpg" alt="Arjun N - Dubai Operations" loading="eager">
-                                <div class="ceo-photo-badge">
-                                    <span>Dubai Headquarters</span>
-                                </div>
+                                <img src="../assets/profilepic3.jpg" alt="Arjun N" loading="eager">
                             </div>
                         </div>
 
@@ -122,21 +113,7 @@
                         <div class="frame-accent-bottom"></div>
                     </div>
 
-                    <!-- 3-Photo Interactive Thumbnails Row (Always visible and accessible on mobile/iOS) -->
-                    <div class="ceo-thumbnails-row" id="ceoThumbnails" role="tablist" aria-label="Leadership Photos">
-                        <button class="ceo-thumb-btn active" data-slide="0" role="tab" aria-selected="true" aria-label="View Profile Photo 1">
-                            <img src="../assets/profilepic.jpeg" alt="Arjun N - Photo 1">
-                            <span class="thumb-label">Photo 1</span>
-                        </button>
-                        <button class="ceo-thumb-btn" data-slide="1" role="tab" aria-selected="false" aria-label="View Profile Photo 2">
-                            <img src="../assets/profilepic2.jpg" alt="Arjun N - Photo 2">
-                            <span class="thumb-label">Photo 2</span>
-                        </button>
-                        <button class="ceo-thumb-btn" data-slide="2" role="tab" aria-selected="false" aria-label="View Profile Photo 3">
-                            <img src="../assets/profilepic3.jpg" alt="Arjun N - Photo 3">
-                            <span class="thumb-label">Photo 3</span>
-                        </button>
-                    </div>
+
                     <div class="ceo-image-accent"></div>
                 </div>
                 <div class="ceo-bio-column" data-animate="fade-left">
@@ -331,7 +308,6 @@
         var sliderFrame = document.querySelector('.ceo-image-frame');
         var slides      = document.querySelectorAll('.ceo-slide');
         var dots        = document.querySelectorAll('.ceo-dot');
-        var thumbs      = document.querySelectorAll('.ceo-thumb-btn');
         var prevBtn     = document.getElementById('ceoSlidePrev');
         var nextBtn     = document.getElementById('ceoSlideNext');
         var current     = 0;
@@ -343,10 +319,6 @@
             // Remove active classes
             slides[current].classList.remove('active');
             if (dots[current]) dots[current].classList.remove('active');
-            if (thumbs[current]) {
-                thumbs[current].classList.remove('active');
-                thumbs[current].setAttribute('aria-selected', 'false');
-            }
             
             // Set new index
             current = (idx + slides.length) % slides.length;
@@ -354,10 +326,6 @@
             // Add active classes
             slides[current].classList.add('active');
             if (dots[current]) dots[current].classList.add('active');
-            if (thumbs[current]) {
-                thumbs[current].classList.add('active');
-                thumbs[current].setAttribute('aria-selected', 'true');
-            }
         }
 
         function autoPlay() {
@@ -370,15 +338,6 @@
         // Dot Navigation
         dots.forEach(function(dot, i) {
             dot.addEventListener('click', function(e) {
-                e.preventDefault();
-                goTo(i);
-                autoPlay();
-            });
-        });
-
-        // Thumbnail Navigation
-        thumbs.forEach(function(thumb, i) {
-            thumb.addEventListener('click', function(e) {
                 e.preventDefault();
                 goTo(i);
                 autoPlay();
