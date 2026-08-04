@@ -111,8 +111,8 @@
     <!-- Hero Section - Cinematic Full-Screen -->
     <section class="hero" id="home" aria-label="Hero">
         <div class="hero-video-bg">
-            <video class="hero-bg-video" autoplay muted loop playsinline preload="auto" poster="assets/hero-building.jpg.jpeg">
-                <source src="assets/add_more_professional_global_l.mp4" type="video/mp4">
+            <video class="hero-bg-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload">
+                <source src="assets/add_more_professional_global_l_old_backup.mp4" type="video/mp4">
             </video>
             <div class="hero-video-overlay"></div>
             <div class="hero-video-text-mask" aria-hidden="true"></div>
@@ -349,7 +349,7 @@
                         </div>
                     </div>
                     <div class="project-card-compact" data-animate="fade-up" data-delay="0.3">
-                        <div class="project-compact-visual" style="background-image: url('assets/outsidelookentrance.jpeg');"></div>
+                        <div class="project-compact-visual" style="background-image: url('assets/swiggy-hub.jpeg');"></div>
                         <div class="project-compact-info">
                             <span class="project-category">Food & Delivery</span>
                             <h4>Swiggy Warehousing Hub</h4>
@@ -380,7 +380,7 @@
             </div>
             <div class="video-showcase-wrapper" data-animate="fade-up" data-delay="0.2">
                 <div class="video-container">
-                    <video id="showcaseVideo" class="showcase-video" autoplay muted loop playsinline preload="auto" poster="assets/hero-building.jpg.jpeg">
+                    <video id="showcaseVideo" class="showcase-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload">
                         <source src="assets/warehousevideo.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -392,6 +392,11 @@
                         </button>
                         <span class="video-caption">Our Warehouse Operations</span>
                     </div>
+                    <button class="showcase-sound-btn" id="showcaseSoundBtn" aria-label="Toggle warehouse video sound">
+                        <svg class="showcase-unmute-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                        <svg class="showcase-sound-on-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        <span class="showcase-sound-text">Sound</span>
+                    </button>
                 </div>
                 <div class="video-stats-row">
                     <div class="video-stat-item">
@@ -506,7 +511,7 @@
                 <!-- Warehouse 5: Outside Look Entrance -->
                 <div class="gallery-item" data-category="warehouse" data-animate="fade-up" data-delay="0.5">
                     <div class="gallery-image-wrap">
-                        <img src="assets/outsidelookentrance.jpeg" alt="Arjun Realty - Logistics Hub Main Entrance" loading="lazy">
+                        <img src="assets/logistics-command-hub.jpeg" alt="Arjun Realty - Logistics Hub Main Entrance" loading="lazy">
                         <div class="gallery-overlay">
                             <div class="gallery-overlay-content">
                                 <span class="gallery-cat">Warehouse</span>

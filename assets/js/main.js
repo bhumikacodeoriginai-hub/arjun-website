@@ -37,17 +37,60 @@ document.addEventListener('DOMContentLoaded', () => {
     initParticles();
 });
 
-/* === HERO VIDEO SOUND CONTROL === */
+/* === HERO VIDEO SOUND CONTROL & AUTOPLAY === */
 function initHeroVideo() {
     const heroVideo = document.querySelector('.hero-bg-video');
+    if (!heroVideo) return;
+
+    // Ensure muted & inline playback for browser autoplay policies
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+    heroVideo.playsInline = true;
+    heroVideo.setAttribute('playsinline', '');
+    heroVideo.setAttribute('webkit-playsinline', '');
+
+    // Play video
+    const playHero = () => {
+        if (heroVideo.paused) {
+            const playPromise = heroVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Browser policy will unlock on first user gesture
+                });
+            }
+        }
+    };
+
+    // Immediate playback attempt
+    playHero();
+
+    // Trigger playback on loaded metadata / data
+    heroVideo.addEventListener('loadeddata', playHero, { once: true });
+    heroVideo.addEventListener('canplay', playHero, { once: true });
+
+    // Universal interaction triggers for instant playback across all browsers
+    const userTriggers = ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown', 'scroll', 'wheel', 'mousemove'];
+    userTriggers.forEach(evt => {
+        window.addEventListener(evt, playHero, { once: true, passive: true });
+    });
+
+    // Resume when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            playHero();
+        }
+    });
+
+    // Sound toggle button
     const unmuteBtn = document.getElementById('heroUnmuteBtn');
-    if (!heroVideo || !unmuteBtn) return;
+    if (!unmuteBtn) return;
 
     const unmuteIcon = unmuteBtn.querySelector('.unmute-icon');
     const soundOnIcon = unmuteBtn.querySelector('.sound-on-icon');
     const unmuteText = unmuteBtn.querySelector('.unmute-text');
 
-    unmuteBtn.addEventListener('click', () => {
+    unmuteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (heroVideo.muted) {
             heroVideo.muted = false;
             heroVideo.volume = 1.0;
@@ -55,6 +98,7 @@ function initHeroVideo() {
             if (soundOnIcon) soundOnIcon.style.display = 'block';
             if (unmuteText) unmuteText.textContent = 'Sound On';
             unmuteBtn.classList.add('muted-off');
+            playHero();
         } else {
             heroVideo.muted = true;
             if (unmuteIcon) unmuteIcon.style.display = 'block';
@@ -62,11 +106,6 @@ function initHeroVideo() {
             if (unmuteText) unmuteText.textContent = 'Tap for Sound';
             unmuteBtn.classList.remove('muted-off');
         }
-    });
-
-    // Try autoplay - if it fails, show play button
-    heroVideo.play().catch(() => {
-        // Autoplay blocked - will play on first interaction
     });
 }
 
@@ -561,29 +600,77 @@ function initVideoShowcase() {
     const video = document.getElementById('showcaseVideo');
     const playBtn = document.getElementById('videoPlayBtn');
     const playOverlay = document.getElementById('videoPlayOverlay');
-    if (!video || !playBtn) return;
+    const soundBtn = document.getElementById('showcaseSoundBtn');
+    if (!video) return;
 
-    const playIcon = playBtn.querySelector('.play-icon');
-    const pauseIcon = playBtn.querySelector('.pause-icon');
+    // Ensure muted & inline playback for browser autoplay policies
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
 
-    // Toggle play/pause
-    playOverlay.addEventListener('click', () => {
+    const playIcon = playBtn ? playBtn.querySelector('.play-icon') : null;
+    const pauseIcon = playBtn ? playBtn.querySelector('.pause-icon') : null;
+
+    const setPlayingUI = (isPlaying) => {
+        if (playOverlay) {
+            if (isPlaying) {
+                playOverlay.classList.add('playing');
+            } else {
+                playOverlay.classList.remove('playing');
+            }
+        }
+        if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
+        if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+    };
+
+    const tryPlayShowcase = () => {
         if (video.paused) {
-            video.play();
-            if (playIcon) playIcon.style.display = 'none';
-            if (pauseIcon) pauseIcon.style.display = 'block';
-            playOverlay.classList.add('playing');
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+            }
+        }
+    };
+
+    // Immediate autoplay attempt
+    tryPlayShowcase();
+    video.addEventListener('loadeddata', tryPlayShowcase, { once: true });
+    video.addEventListener('canplay', tryPlayShowcase, { once: true });
+
+    // Sync UI with video native events
+    video.addEventListener('playing', () => setPlayingUI(true));
+    video.addEventListener('play', () => setPlayingUI(true));
+    video.addEventListener('pause', () => setPlayingUI(false));
+    video.addEventListener('ended', () => setPlayingUI(false));
+
+    // Toggle play/pause on overlay click
+    if (playOverlay) {
+        playOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (video.paused) {
+                video.play().then(() => setPlayingUI(true)).catch(() => {});
+            } else {
+                video.pause();
+                setPlayingUI(false);
+            }
+        });
+    }
+
+    // Toggle play/pause directly on clicking the video
+    video.addEventListener('click', () => {
+        if (video.paused) {
+            video.play().then(() => setPlayingUI(true)).catch(() => {});
         } else {
             video.pause();
-            if (playIcon) playIcon.style.display = 'block';
-            if (pauseIcon) pauseIcon.style.display = 'none';
-            playOverlay.classList.remove('playing');
+            setPlayingUI(false);
         }
     });
 
-    // Show overlay on hover when playing
-    const container = playOverlay.closest('.video-container');
-    if (container) {
+    // Hover effect for play overlay
+    const container = video.closest('.video-container');
+    if (container && playOverlay) {
         container.addEventListener('mouseenter', () => {
             if (!video.paused) {
                 playOverlay.style.opacity = '1';
@@ -596,25 +683,63 @@ function initVideoShowcase() {
         });
     }
 
-    // Update UI when video starts playing (autoplay)
-    video.addEventListener('playing', () => {
-        if (playIcon) playIcon.style.display = 'none';
-        if (pauseIcon) pauseIcon.style.display = 'block';
-        playOverlay.classList.add('playing');
-    });
+    // IntersectionObserver to auto-play when scrolled into viewport
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tryPlayShowcase();
+                }
+            });
+        }, { threshold: 0.15 });
+        observer.observe(video);
+    }
 
-    // iOS autoplay fix: try to play on first user interaction
-    document.addEventListener('touchstart', function iosAutoplay() {
-        if (video.paused) {
-            video.play().catch(() => {});
-        }
-        // Also play hero video
+    // Sound toggle support for showcase video
+    if (soundBtn) {
+        const unmutedIcon = soundBtn.querySelector('.showcase-sound-on-icon');
+        const mutedIcon = soundBtn.querySelector('.showcase-unmute-icon');
+        const soundText = soundBtn.querySelector('.showcase-sound-text');
+
+        soundBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (video.muted) {
+                video.muted = false;
+                video.volume = 1.0;
+                if (mutedIcon) mutedIcon.style.display = 'none';
+                if (unmutedIcon) unmutedIcon.style.display = 'block';
+                if (soundText) soundText.textContent = 'Mute';
+                soundBtn.classList.add('active');
+                tryPlayShowcase();
+            } else {
+                video.muted = true;
+                if (mutedIcon) mutedIcon.style.display = 'block';
+                if (unmutedIcon) unmutedIcon.style.display = 'none';
+                if (soundText) soundText.textContent = 'Sound';
+                soundBtn.classList.remove('active');
+            }
+        });
+    }
+
+    // Play on first user interaction if blocked by strict browser policy
+    const userTriggers = ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown', 'scroll'];
+    const onUserInteraction = () => {
+        tryPlayShowcase();
         const heroVid = document.querySelector('.hero-bg-video');
         if (heroVid && heroVid.paused) {
             heroVid.play().catch(() => {});
         }
-        document.removeEventListener('touchstart', iosAutoplay);
-    }, { once: true, passive: true });
+    };
+    userTriggers.forEach(evt => {
+        window.addEventListener(evt, onUserInteraction, { once: true, passive: true });
+    });
+
+    // Resume when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            tryPlayShowcase();
+        }
+    });
 }
 
 

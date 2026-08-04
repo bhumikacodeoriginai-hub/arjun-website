@@ -134,7 +134,7 @@ class TestRunner:
         req = urllib.request.Request(url, headers={'User-Agent': 'ArjunQA-Runner/1.0'})
         try:
             with urllib.request.urlopen(req, timeout=5) as response:
-                return response.status, response.read()
+                return response.status, response.read(1048576)
         except urllib.error.HTTPError as e:
             return e.code, b""
         except Exception as e:
@@ -236,8 +236,9 @@ class TestRunner:
 
         # MODULE 6: VIDEOS
         print(f"\n{Colors.BOLD}{Colors.YELLOW}>> Module 6: Videos (ARJ-030 - ARJ-034){Colors.RESET}")
-        st_v1, _ = self.fetch_binary("assets/add_more_professional_global_l.mp4")
-        self.record("ARJ-030", "Hero video file integrity", st_v1 == 200, "add_more_professional_global_l.mp4 -> 200")
+        hero_v_path = "assets/add_more_professional_global_l_old_backup.mp4" if "add_more_professional_global_l_old_backup.mp4" in html_root else "assets/add_more_professional_global_l.mp4"
+        st_v1, _ = self.fetch_binary(hero_v_path)
+        self.record("ARJ-030", "Hero video file integrity", st_v1 == 200, f"{hero_v_path} -> 200")
         st_v2, _ = self.fetch_binary("assets/warehousevideo.mp4")
         self.record("ARJ-031", "Warehouse video file integrity", st_v2 == 200, "warehousevideo.mp4 -> 200")
         has_autoplay = 'autoplay' in html_root and 'muted' in html_root and 'playsinline' in html_root
