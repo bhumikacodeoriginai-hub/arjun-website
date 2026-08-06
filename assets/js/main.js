@@ -48,14 +48,27 @@ function initHeroVideo() {
     heroVideo.playsInline = true;
     heroVideo.setAttribute('playsinline', '');
     heroVideo.setAttribute('webkit-playsinline', '');
+    heroVideo.setAttribute('x5-playsinline', ''); // UC Browser Android
+    heroVideo.setAttribute('x5-video-player-type', 'h5'); // TBS Android
+    heroVideo.setAttribute('x5-video-player-fullscreen', 'false');
 
-    // Play video
+    // Play video with retry logic
+    let retryCount = 0;
+    const maxRetries = 3;
+
     const playHero = () => {
         if (heroVideo.paused) {
             const playPromise = heroVideo.play();
             if (playPromise !== undefined) {
-                playPromise.catch(() => {
+                playPromise.then(() => {
+                    retryCount = 0; // Reset on success
+                }).catch(() => {
                     // Browser policy will unlock on first user gesture
+                    // Retry after short delay (handles iOS low-power mode)
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        setTimeout(playHero, 500 * retryCount);
+                    }
                 });
             }
         }
@@ -67,6 +80,26 @@ function initHeroVideo() {
     // Trigger playback on loaded metadata / data
     heroVideo.addEventListener('loadeddata', playHero, { once: true });
     heroVideo.addEventListener('canplay', playHero, { once: true });
+    heroVideo.addEventListener('loadedmetadata', playHero, { once: true });
+
+    // Handle video stall/error - attempt recovery
+    heroVideo.addEventListener('stalled', () => {
+        heroVideo.load();
+        setTimeout(playHero, 300);
+    });
+
+    heroVideo.addEventListener('error', () => {
+        // Reload video source on error
+        heroVideo.load();
+        setTimeout(playHero, 500);
+    });
+
+    // Ensure video doesn't get stuck in waiting state
+    heroVideo.addEventListener('waiting', () => {
+        setTimeout(() => {
+            if (heroVideo.paused) playHero();
+        }, 1000);
+    });
 
     // Universal interaction triggers for instant playback across all browsers
     const userTriggers = ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown', 'scroll', 'wheel', 'mousemove'];
@@ -80,6 +113,10 @@ function initHeroVideo() {
             playHero();
         }
     });
+
+    // iOS: Resume on page focus (handles Safari tab switching)
+    window.addEventListener('focus', playHero);
+    window.addEventListener('pageshow', playHero);
 
     // Sound toggle button
     const unmuteBtn = document.getElementById('heroUnmuteBtn');
