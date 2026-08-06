@@ -848,3 +848,172 @@ function initGallery() {
         document.body.style.overflow = '';
     }
 }
+
+
+/* === GALLERY VIDEO - Play/Pause & Sound Controls === */
+document.addEventListener('DOMContentLoaded', () => {
+    initGalleryVideos();
+});
+
+function initGalleryVideos() {
+    const videoItems = document.querySelectorAll('.gallery-video-item');
+    if (!videoItems.length) return;
+
+    videoItems.forEach(item => {
+        const video = item.querySelector('.gallery-video');
+        const soundBtn = item.querySelector('.gallery-video-sound-btn');
+        const playIndicator = item.querySelector('.gallery-video-play-indicator');
+        const soundOffIcon = item.querySelector('.sound-off-icon');
+        const soundOnIcon = item.querySelector('.sound-on-icon');
+        const playIcon = item.querySelector('.play-icon');
+        const pauseIcon = item.querySelector('.pause-icon');
+
+        if (!video) return;
+
+        // Ensure video plays (iOS/Android sometimes block autoplay)
+        function attemptAutoplay() {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(function() {
+                    // Autoplay was blocked - show play button
+                    video.pause();
+                    updatePlayPauseUI(false);
+                });
+            }
+        }
+
+        // Update play/pause button UI
+        function updatePlayPauseUI(isPlaying) {
+            if (playIcon && pauseIcon) {
+                playIcon.style.display = isPlaying ? 'none' : 'block';
+                pauseIcon.style.display = isPlaying ? 'block' : 'none';
+            }
+        }
+
+        // Update sound button UI
+        function updateSoundUI(isMuted) {
+            if (soundOffIcon && soundOnIcon) {
+                soundOffIcon.style.display = isMuted ? 'block' : 'none';
+                soundOnIcon.style.display = isMuted ? 'none' : 'block';
+            }
+        }
+
+        // Play/Pause toggle on indicator click
+        if (playIndicator) {
+            playIndicator.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (video.paused) {
+                    video.play();
+                    updatePlayPauseUI(true);
+                } else {
+                    video.pause();
+                    updatePlayPauseUI(false);
+                }
+            });
+
+            // Touch support for play indicator
+            playIndicator.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (video.paused) {
+                    video.play();
+                    updatePlayPauseUI(true);
+                } else {
+                    video.pause();
+                    updatePlayPauseUI(false);
+                }
+            });
+        }
+
+        // Sound toggle
+        if (soundBtn) {
+            soundBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                video.muted = !video.muted;
+                updateSoundUI(video.muted);
+            });
+
+            soundBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                video.muted = !video.muted;
+                updateSoundUI(video.muted);
+            });
+        }
+
+        // Listen for video state changes
+        video.addEventListener('play', function() {
+            updatePlayPauseUI(true);
+        });
+
+        video.addEventListener('pause', function() {
+            updatePlayPauseUI(false);
+        });
+
+        // IntersectionObserver - pause when out of viewport (performance optimization)
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        video.play().catch(function() {});
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, {
+                threshold: 0.3,
+                rootMargin: '0px'
+            });
+            observer.observe(item);
+        }
+
+        // Initial state - set UI
+        updatePlayPauseUI(!video.paused);
+        updateSoundUI(video.muted);
+
+        // Try to play once page is loaded/visible
+        if (document.visibilityState === 'visible') {
+            attemptAutoplay();
+        }
+
+        // Handle visibility change (e.g., tab switch)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                attemptAutoplay();
+            } else {
+                video.pause();
+            }
+        });
+
+        // Fix for iOS: ensure video loads and plays on first interaction
+        function iosPlayFix() {
+            video.play().catch(function() {});
+            document.removeEventListener('touchstart', iosPlayFix);
+        }
+        document.addEventListener('touchstart', iosPlayFix, { once: true, passive: true });
+    });
+
+    // Prevent gallery video items from triggering the lightbox
+    videoItems.forEach(item => {
+        const videoWrap = item.querySelector('.gallery-video-wrap');
+        if (videoWrap) {
+            videoWrap.addEventListener('click', function(e) {
+                // Don't propagate to lightbox handler unless it's a specific button
+                if (!e.target.closest('.gallery-video-sound-btn') && !e.target.closest('.gallery-video-play-indicator')) {
+                    // Toggle play/pause on general video area tap
+                    const video = item.querySelector('.gallery-video');
+                    if (video) {
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                    }
+                }
+                e.stopPropagation();
+            });
+        }
+    });
+}
