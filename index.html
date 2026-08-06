@@ -66,12 +66,11 @@
     </script> -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/animations.css">
     <link rel="stylesheet" href="assets/css/mobile-fixes.css">
-    <!-- Preload fonts for instant rendering -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
 </head>
 <body class="loaded">
     <!-- No preloader - instant content display -->
@@ -94,7 +93,7 @@
     <nav class="navbar" id="navbar" role="navigation" aria-label="Main Navigation">
         <div class="nav-container">
             <a href="index.html" class="nav-logo" aria-label="Arjun Realty Home">
-                <img src="assets/Arun-Realty.Logo.png" alt="Arjun Realty - Building the Future of Global Warehousing" class="nav-logo-img" width="160" height="160">
+                <img src="assets/Arun-Realty.Logo.png" alt="Arjun Realty - Building the Future of Global Warehousing" class="nav-logo-img" width="160" height="160" fetchpriority="high" decoding="async">
             </a>
             <div class="nav-links" id="navLinks" role="menubar">
                 <a href="#home" class="nav-link active" role="menuitem" data-en="Home" data-ar="الرئيسية">Home</a>
@@ -128,7 +127,7 @@
     <!-- Hero Section - Cinematic Full-Screen -->
     <section class="hero" id="home" aria-label="Hero">
         <div class="hero-video-bg">
-            <video class="hero-bg-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload" disablePictureInPicture>
+            <video class="hero-bg-video" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload" disablePictureInPicture>
                 <source src="assets/finalscreenvideo.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -1376,9 +1375,9 @@
         </div>
     </div>
 
-    <!-- Scripts - Core first, heavy libs deferred -->
-    <script src="assets/js/lang.js"></script>
-    <script src="assets/js/main.js"></script>
+    <!-- Scripts - All deferred for zero render-blocking -->
+    <script src="assets/js/lang.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
     <script src="assets/js/enhancements.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>

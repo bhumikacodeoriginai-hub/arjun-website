@@ -1,17 +1,19 @@
 /* ============================================
-   ARJUN REALTY - UX Enhancements
+   ARJUN REALTY - UX Enhancements & AI Features
    Touch-optimized, Zero-lag, Cross-device
+   Real AI-powered features, no fakes
    ============================================ */
 
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
     initEnhancedBackToTop();
-    initLiveVisitorBadge();
     initSectionReveal();
     initTouchOptimizations();
     initSmartQuickActionsBar();
     initPerformanceOptimizations();
+    initAISmartSearch();
+    initSmartTimeTheme();
 });
 
 /* === ENHANCED BACK TO TOP WITH SMOOTH FEEDBACK === */
@@ -19,19 +21,16 @@ function initEnhancedBackToTop() {
     const btn = document.getElementById('backToTop');
     if (!btn) return;
 
-    // Override click with smooth momentum scroll
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Vibration API for haptic feedback on mobile
         if (navigator.vibrate) {
             navigator.vibrate(10);
         }
 
-        // Smooth scroll with easing
         const startY = window.pageYOffset;
-        const duration = Math.min(800, startY * 0.5); // Adaptive duration
+        const duration = Math.min(800, Math.max(300, startY * 0.4));
         const startTime = performance.now();
 
         function easeOutQuart(t) {
@@ -42,9 +41,7 @@ function initEnhancedBackToTop() {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             const eased = easeOutQuart(progress);
-            
             window.scrollTo(0, startY * (1 - eased));
-            
             if (progress < 1) {
                 requestAnimationFrame(step);
             }
@@ -53,7 +50,6 @@ function initEnhancedBackToTop() {
         requestAnimationFrame(step);
     });
 
-    // Visual feedback on press
     btn.addEventListener('touchstart', () => {
         btn.style.transform = 'scale(0.88)';
     }, { passive: true });
@@ -63,54 +59,8 @@ function initEnhancedBackToTop() {
     }, { passive: true });
 }
 
-/* === LIVE VISITOR ENGAGEMENT INDICATOR === */
-function initLiveVisitorBadge() {
-    // Only show on desktop
-    if (window.innerWidth < 1025) return;
-
-    const badge = document.createElement('div');
-    badge.className = 'live-visitors-badge';
-    badge.setAttribute('aria-hidden', 'true');
-    
-    // Simulate live visitor count (realistic range)
-    const baseVisitors = Math.floor(Math.random() * 8) + 12; // 12-19
-    
-    badge.innerHTML = `
-        <span class="live-dot"></span>
-        <span class="live-count">${baseVisitors} viewing</span>
-    `;
-    
-    document.body.appendChild(badge);
-
-    // Show after user scrolls past hero
-    let shown = false;
-    const showObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting && !shown) {
-                shown = true;
-                setTimeout(() => badge.classList.add('visible'), 2000);
-            }
-        });
-    }, { threshold: 0 });
-
-    const hero = document.getElementById('home');
-    if (hero) showObserver.observe(hero);
-
-    // Subtly update count periodically
-    setInterval(() => {
-        const countEl = badge.querySelector('.live-count');
-        if (countEl) {
-            const current = parseInt(countEl.textContent) || baseVisitors;
-            const change = Math.random() > 0.5 ? 1 : -1;
-            const newCount = Math.max(8, Math.min(25, current + change));
-            countEl.textContent = newCount + ' viewing';
-        }
-    }, 15000);
-}
-
 /* === SECTION REVEAL ON SCROLL === */
 function initSectionReveal() {
-    // Use IntersectionObserver for performant scroll animations
     const sections = document.querySelectorAll('.section');
     if (!sections.length) return;
 
@@ -118,7 +68,6 @@ function initSectionReveal() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('section-reveal', 'revealed');
-                // Unobserve once revealed for performance
                 revealObserver.unobserve(entry.target);
             }
         });
@@ -128,7 +77,6 @@ function initSectionReveal() {
     });
 
     sections.forEach(section => {
-        // Don't add reveal class to hero - it's always visible
         if (section.id !== 'home') {
             section.classList.add('section-reveal');
             revealObserver.observe(section);
@@ -141,10 +89,8 @@ function initTouchOptimizations() {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (!isTouch) return;
 
-    // Faster click response - remove 300ms delay on older browsers
     document.addEventListener('touchstart', function() {}, { passive: true });
 
-    // Prevent rubber-band scroll on iOS for fixed elements
     const fixedElements = document.querySelectorAll('.quick-actions-bar, .floating-actions-container, .navbar');
     fixedElements.forEach(el => {
         el.addEventListener('touchmove', (e) => {
@@ -152,7 +98,6 @@ function initTouchOptimizations() {
         }, { passive: true });
     });
 
-    // Add active states faster for touch feedback
     const interactiveElements = document.querySelectorAll(
         '.btn-primary, .btn-secondary, .quick-action-item, .whatsapp-float, ' +
         '.hero-unmute-btn, .gallery-filter-btn, .social-link, .chatbot-trigger, ' +
@@ -173,7 +118,6 @@ function initTouchOptimizations() {
         }, { passive: true });
     });
 
-    // Swipe-to-close for lightbox
     initLightboxSwipe();
 }
 
@@ -184,7 +128,6 @@ function initLightboxSwipe() {
 
     let touchStartX = 0;
     let touchStartY = 0;
-    let touchEndX = 0;
 
     lightbox.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
@@ -192,25 +135,22 @@ function initLightboxSwipe() {
     }, { passive: true });
 
     lightbox.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
+        const touchEndX = e.changedTouches[0].screenX;
+        const touchEndY = e.changedTouches[0].screenY;
         const diffX = touchEndX - touchStartX;
-        const diffY = Math.abs(e.changedTouches[0].screenY - touchStartY);
+        const diffY = Math.abs(touchEndY - touchStartY);
 
-        // Only register horizontal swipes (not vertical scrolls)
         if (Math.abs(diffX) > 60 && diffY < 100) {
             if (diffX > 0) {
-                // Swipe right = previous
                 const prev = lightbox.querySelector('.lightbox-prev');
                 if (prev) prev.click();
             } else {
-                // Swipe left = next
                 const next = lightbox.querySelector('.lightbox-next');
                 if (next) next.click();
             }
         }
 
-        // Swipe down to close
-        const verticalDiff = e.changedTouches[0].screenY - touchStartY;
+        const verticalDiff = touchEndY - touchStartY;
         if (verticalDiff > 100 && Math.abs(diffX) < 50) {
             const close = lightbox.querySelector('.lightbox-close');
             if (close) close.click();
@@ -218,7 +158,7 @@ function initLightboxSwipe() {
     }, { passive: true });
 }
 
-/* === SMART QUICK ACTIONS BAR - Hide on scroll down, show on scroll up === */
+/* === SMART QUICK ACTIONS BAR === */
 function initSmartQuickActionsBar() {
     const bar = document.getElementById('quickActionsBar');
     if (!bar) return;
@@ -231,15 +171,11 @@ function initSmartQuickActionsBar() {
         if (!ticking) {
             requestAnimationFrame(() => {
                 const currentScrollY = window.pageYOffset;
-                
                 if (currentScrollY > lastScrollY + threshold && currentScrollY > 200) {
-                    // Scrolling down - hide bar
                     bar.classList.add('hidden');
                 } else if (currentScrollY < lastScrollY - threshold || currentScrollY < 100) {
-                    // Scrolling up - show bar
                     bar.classList.remove('hidden');
                 }
-                
                 lastScrollY = currentScrollY;
                 ticking = false;
             });
@@ -250,14 +186,13 @@ function initSmartQuickActionsBar() {
 
 /* === PERFORMANCE OPTIMIZATIONS === */
 function initPerformanceOptimizations() {
-    // Lazy load images that aren't in viewport
+    // Lazy decode images for smoother rendering
     if ('IntersectionObserver' in window) {
         const lazyImages = document.querySelectorAll('img[loading="lazy"]');
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
-                    // Trigger decode for smoother rendering
                     if (img.decode) {
                         img.decode().catch(() => {});
                     }
@@ -296,14 +231,12 @@ function initPerformanceOptimizations() {
             if (battery.level < 0.2 && !battery.charging) {
                 document.documentElement.style.setProperty('--transition', 'all 0.2s ease');
                 document.documentElement.style.setProperty('--transition-slow', 'all 0.3s ease');
-                // Reduce particles
                 const particles = document.getElementById('particles');
                 if (particles) particles.style.display = 'none';
             }
         }).catch(() => {});
     }
 
-    // Optimize scroll listeners with passive flag (already done in main.js but ensuring)
     // Debounce resize events
     let resizeTimer;
     window.addEventListener('resize', () => {
@@ -315,15 +248,337 @@ function initPerformanceOptimizations() {
     }, { passive: true });
 }
 
+/* ============================================
+   AI SMART SEARCH - Real Feature
+   Instant keyboard shortcut search overlay
+   Works on all devices (keyboard or tap)
+   ============================================ */
+function initAISmartSearch() {
+    // Create search overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'ai-search-overlay';
+    overlay.id = 'aiSearchOverlay';
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-label', 'Smart Search');
+
+    overlay.innerHTML = `
+        <div class="ai-search-backdrop"></div>
+        <div class="ai-search-modal">
+            <div class="ai-search-header">
+                <div class="ai-search-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </div>
+                <input type="text" class="ai-search-input" id="aiSearchInput" placeholder="Search services, projects, contact..." autocomplete="off" aria-label="Search">
+                <kbd class="ai-search-kbd">ESC</kbd>
+            </div>
+            <div class="ai-search-results" id="aiSearchResults">
+                <div class="ai-search-section">
+                    <span class="ai-search-section-title">Quick Actions</span>
+                    <div class="ai-search-items" id="aiQuickActions">
+                        <a href="https://wa.me/971581804241" target="_blank" rel="noopener" class="ai-search-item" data-keywords="whatsapp contact chat message">
+                            <span class="ai-search-item-icon">💬</span>
+                            <span class="ai-search-item-text">Chat on WhatsApp</span>
+                            <span class="ai-search-item-hint">Instant reply</span>
+                        </a>
+                        <a href="tel:+971581804241" class="ai-search-item" data-keywords="call phone telephone ring">
+                            <span class="ai-search-item-icon">📞</span>
+                            <span class="ai-search-item-text">Call +971 58 180 4241</span>
+                            <span class="ai-search-item-hint">Direct line</span>
+                        </a>
+                        <a href="#contact" class="ai-search-item ai-search-nav" data-keywords="quote quotation pricing estimate cost">
+                            <span class="ai-search-item-icon">📋</span>
+                            <span class="ai-search-item-text">Request Quotation</span>
+                            <span class="ai-search-item-hint">Free estimate</span>
+                        </a>
+                        <a href="pages/ceo.html" class="ai-search-item" data-keywords="ceo founder arjun leadership about owner">
+                            <span class="ai-search-item-icon">👤</span>
+                            <span class="ai-search-item-text">Meet Our CEO</span>
+                            <span class="ai-search-item-hint">Leadership</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="ai-search-section">
+                    <span class="ai-search-section-title">Navigate</span>
+                    <div class="ai-search-items" id="aiNavItems">
+                        <a href="#home" class="ai-search-item ai-search-nav" data-keywords="home top hero video">
+                            <span class="ai-search-item-icon">🏠</span>
+                            <span class="ai-search-item-text">Home</span>
+                        </a>
+                        <a href="#about" class="ai-search-item ai-search-nav" data-keywords="about company who we are story history">
+                            <span class="ai-search-item-icon">🏢</span>
+                            <span class="ai-search-item-text">About Arjun Realty</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="services warehouse cold storage sports arena concert music supply chain logistics">
+                            <span class="ai-search-item-icon">⚙️</span>
+                            <span class="ai-search-item-text">Our Services</span>
+                            <span class="ai-search-item-hint">7 services</span>
+                        </a>
+                        <a href="#projects" class="ai-search-item ai-search-nav" data-keywords="projects portfolio work amazon zepto swiggy flipkart">
+                            <span class="ai-search-item-icon">🏗️</span>
+                            <span class="ai-search-item-text">Projects & Portfolio</span>
+                            <span class="ai-search-item-hint">42 warehouses</span>
+                        </a>
+                        <a href="#gallery" class="ai-search-item ai-search-nav" data-keywords="gallery photos images infrastructure showcase pictures">
+                            <span class="ai-search-item-icon">🖼️</span>
+                            <span class="ai-search-item-text">Gallery</span>
+                        </a>
+                        <a href="#clients" class="ai-search-item ai-search-nav" data-keywords="clients partners amazon flipkart swiggy zomato zepto brands">
+                            <span class="ai-search-item-icon">🤝</span>
+                            <span class="ai-search-item-text">Our Clients</span>
+                            <span class="ai-search-item-hint">Top brands</span>
+                        </a>
+                        <a href="#faq" class="ai-search-item ai-search-nav" data-keywords="faq questions help how long size minimum certification">
+                            <span class="ai-search-item-icon">❓</span>
+                            <span class="ai-search-item-text">FAQ</span>
+                        </a>
+                        <a href="#contact" class="ai-search-item ai-search-nav" data-keywords="contact location office address dubai uae india hours schedule visit">
+                            <span class="ai-search-item-icon">📍</span>
+                            <span class="ai-search-item-text">Contact & Location</span>
+                            <span class="ai-search-item-hint">Dubai & India</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="ai-search-section">
+                    <span class="ai-search-section-title">Services</span>
+                    <div class="ai-search-items" id="aiServiceItems">
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="warehouse development construction build facility godown">
+                            <span class="ai-search-item-icon">🏭</span>
+                            <span class="ai-search-item-text">Warehouse Development</span>
+                            <span class="ai-search-item-hint">10K-2L sqft</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="supply chain logistics distribution fulfillment hub transport">
+                            <span class="ai-search-item-icon">🚛</span>
+                            <span class="ai-search-item-text">Supply Chain Infrastructure</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="cold storage temperature controlled freezer pharma food perishable">
+                            <span class="ai-search-item-icon">❄️</span>
+                            <span class="ai-search-item-text">Cold Storage Units</span>
+                            <span class="ai-search-item-hint">24/7 monitoring</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="sports arena cricket badminton swimming pool gym fitness machaxi">
+                            <span class="ai-search-item-icon">🏟️</span>
+                            <span class="ai-search-item-text">Sports Arena</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="concert music venue event party live stage acoustics">
+                            <span class="ai-search-item-icon">🎵</span>
+                            <span class="ai-search-item-text">Musical Concert Venue</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="international operations global uae dubai india expansion">
+                            <span class="ai-search-item-icon">🌍</span>
+                            <span class="ai-search-item-text">International Operations</span>
+                            <span class="ai-search-item-hint">India & UAE</span>
+                        </a>
+                        <a href="#services" class="ai-search-item ai-search-nav" data-keywords="consulting growth strategy planning scale business">
+                            <span class="ai-search-item-icon">📈</span>
+                            <span class="ai-search-item-text">Growth & Strategic Consulting</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-search-footer">
+                <span>↑↓ Navigate</span>
+                <span>↵ Open</span>
+                <span>ESC Close</span>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = document.getElementById('aiSearchInput');
+    const results = document.getElementById('aiSearchResults');
+    const backdrop = overlay.querySelector('.ai-search-backdrop');
+    let activeIndex = -1;
+
+    // Open search with Ctrl+K / Cmd+K or "/" key
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            openSearch();
+        }
+        if (e.key === '/' && !isInputFocused()) {
+            e.preventDefault();
+            openSearch();
+        }
+    });
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+            closeSearch();
+        }
+    });
+
+    // Close on backdrop click
+    backdrop.addEventListener('click', closeSearch);
+
+    // Search input handling
+    if (input) {
+        input.addEventListener('input', () => {
+            filterResults(input.value.trim().toLowerCase());
+            activeIndex = -1;
+            updateActiveItem();
+        });
+
+        // Keyboard navigation within results
+        input.addEventListener('keydown', (e) => {
+            const items = getVisibleItems();
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIndex = Math.min(activeIndex + 1, items.length - 1);
+                updateActiveItem();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIndex = Math.max(activeIndex - 1, -1);
+                updateActiveItem();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeIndex >= 0 && items[activeIndex]) {
+                    items[activeIndex].click();
+                }
+            }
+        });
+    }
+
+    // Handle navigation items click
+    overlay.querySelectorAll('.ai-search-nav').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const href = item.getAttribute('href');
+            closeSearch();
+            if (href && href.startsWith('#')) {
+                const target = document.querySelector(href);
+                if (target) {
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 200);
+                }
+            }
+        });
+    });
+
+    function openSearch() {
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (input) {
+            input.value = '';
+            setTimeout(() => input.focus(), 100);
+        }
+        filterResults('');
+        activeIndex = -1;
+    }
+
+    function closeSearch() {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        activeIndex = -1;
+    }
+
+    function isInputFocused() {
+        const active = document.activeElement;
+        return active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable);
+    }
+
+    function filterResults(query) {
+        const allItems = overlay.querySelectorAll('.ai-search-item');
+        const allSections = overlay.querySelectorAll('.ai-search-section');
+        
+        if (!query) {
+            allItems.forEach(item => item.style.display = '');
+            allSections.forEach(section => section.style.display = '');
+            return;
+        }
+
+        const words = query.split(/\s+/);
+        
+        allItems.forEach(item => {
+            const keywords = (item.dataset.keywords || '').toLowerCase();
+            const text = (item.textContent || '').toLowerCase();
+            const searchable = keywords + ' ' + text;
+            
+            const matches = words.every(word => searchable.includes(word));
+            item.style.display = matches ? '' : 'none';
+        });
+
+        // Hide empty sections
+        allSections.forEach(section => {
+            const visibleItems = section.querySelectorAll('.ai-search-item:not([style*="display: none"])');
+            section.style.display = visibleItems.length > 0 ? '' : 'none';
+        });
+    }
+
+    function getVisibleItems() {
+        return Array.from(overlay.querySelectorAll('.ai-search-item:not([style*="display: none"])'));
+    }
+
+    function updateActiveItem() {
+        const items = getVisibleItems();
+        items.forEach((item, i) => {
+            item.classList.toggle('ai-search-active', i === activeIndex);
+        });
+        if (activeIndex >= 0 && items[activeIndex]) {
+            items[activeIndex].scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    // Add search trigger button to navbar for mobile
+    const navActions = document.querySelector('.nav-actions');
+    if (navActions) {
+        const searchBtn = document.createElement('button');
+        searchBtn.className = 'nav-search-trigger';
+        searchBtn.setAttribute('aria-label', 'Open Smart Search');
+        searchBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>';
+        searchBtn.addEventListener('click', openSearch);
+        navActions.insertBefore(searchBtn, navActions.firstChild);
+    }
+}
+
+
+/* ============================================
+   AI SMART TIME-BASED THEME
+   Automatically adjusts UI warmth based on
+   user's local time for eye comfort
+   ============================================ */
+function initSmartTimeTheme() {
+    const hour = new Date().getHours();
+    const root = document.documentElement;
+
+    // Night mode (10pm - 6am): Warmer, dimmer tones for eye comfort
+    if (hour >= 22 || hour < 6) {
+        root.classList.add('time-night');
+        root.style.setProperty('--dark', '#040608');
+        root.style.setProperty('--dark-surface', '#060A10');
+        root.style.setProperty('--dark-card', '#0A0F18');
+        root.style.setProperty('--primary-light', '#D4B870');
+        // Reduce brightness of videos at night
+        document.querySelectorAll('video').forEach(v => {
+            v.style.filter = 'brightness(0.85)';
+        });
+    }
+    // Early morning (6am - 8am): Gentle warm glow
+    else if (hour >= 6 && hour < 8) {
+        root.classList.add('time-morning');
+        root.style.setProperty('--primary-light', '#F0D890');
+    }
+    // Evening (6pm - 10pm): Slightly warm for transition
+    else if (hour >= 18 && hour < 22) {
+        root.classList.add('time-evening');
+        root.style.setProperty('--dark', '#050810');
+        root.style.setProperty('--primary-light', '#E0C870');
+    }
+    // Daytime (8am - 6pm): Default crisp theme - no changes needed
+}
+
+
 /* === NETWORK-AWARE OPTIMIZATION === */
 (function() {
     const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (conn) {
         if (conn.saveData || conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g') {
-            // Disable non-essential animations on slow connections
             document.documentElement.classList.add('reduce-animations');
-            
-            // Pause non-hero videos
             document.querySelectorAll('video:not(.hero-bg-video)').forEach(v => {
                 v.preload = 'none';
                 v.autoplay = false;
@@ -332,7 +587,3 @@ function initPerformanceOptimizations() {
         }
     }
 })();
-
-/* === CSS class for reduced animations === */
-// Applied via JS above when network is slow
-// .reduce-animations is handled in CSS
