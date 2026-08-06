@@ -28,7 +28,10 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/Arun-Realty.Logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/Arun-Realty.Logo.png">
-    <meta property="og:image" content="assets/Arun-Realty.Logo.png">
+    <meta property="og:image" content="https://arjunrealty.com/assets/Arun-Realty.Logo.png">
+    <meta property="og:image:width" content="1254">
+    <meta property="og:image:height" content="1254">
+    <meta name="twitter:image" content="https://arjunrealty.com/assets/Arun-Realty.Logo.png">
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
@@ -54,13 +57,13 @@
     }
     </script>
     <!-- Google Analytics - Replace G-XXXXXXXXXX with your tracking ID from analytics.google.com -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-XXXXXXXXXX');
-    </script>
+    </script> -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -71,6 +74,16 @@
 </head>
 <body class="loaded">
     <!-- No preloader - instant content display -->
+    <noscript>
+        <style>
+            .hero-bg-video { display: none; }
+            .hero { background: url('assets/hero-building.jpg.jpeg') center/cover no-repeat; }
+            [data-animate] { opacity: 1 !important; transform: none !important; }
+            .cursor-dot, .cursor-outline, .hero-particles, #heroCanvas { display: none !important; }
+            .nav-links { display: flex !important; position: static !important; width: auto !important; height: auto !important; right: auto !important; background: none !important; border: none !important; }
+            .nav-toggle { display: none !important; }
+        </style>
+    </noscript>
 
     <!-- Custom Cursor -->
     <div class="cursor-dot" aria-hidden="true"></div>
@@ -384,7 +397,7 @@
             </div>
             <div class="video-showcase-wrapper" data-animate="fade-up" data-delay="0.2">
                 <div class="video-container">
-                    <video id="showcaseVideo" class="showcase-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload">
+                    <video id="showcaseVideo" class="showcase-video" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="assets/hero-building.jpg.jpeg" controlsList="nodownload">
                         <source src="assets/warehousevideo.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -584,7 +597,7 @@
                 <div class="gallery-item gallery-video-item featured" data-category="music" data-animate="fade-up" data-delay="0.15">
                     <div class="gallery-video-wrap">
                         <video class="gallery-video" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="assets/concert1.jpg" controlsList="nodownload" disablePictureInPicture>
-                            <source src="assets/live party.mp4" type="video/mp4">
+                            <source src="assets/live-party.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         <div class="gallery-video-overlay">
@@ -1277,8 +1290,8 @@
                 <p>&copy; 2026 Arjun Realty. All rights reserved.</p>
                 <p class="footer-credit">Developed by <strong>Code Origin.Ai Private Limited</strong></p>
                 <div class="footer-legal">
-                    <a href="#faq">Privacy Policy</a>
-                    <a href="#faq">Terms of Service</a>
+                    <a href="https://wa.me/971581804241?text=Hi%2C%20I%20would%20like%20to%20know%20about%20your%20Privacy%20Policy." target="_blank" rel="noopener">Privacy Policy</a>
+                    <a href="https://wa.me/971581804241?text=Hi%2C%20I%20would%20like%20to%20know%20about%20your%20Terms%20of%20Service." target="_blank" rel="noopener">Terms of Service</a>
                 </div>
             </div>
         </div>

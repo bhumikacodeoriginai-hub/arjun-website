@@ -2971,6 +2971,79 @@ body {
     outline-offset: 3px;
 }
 
+/* Comprehensive focus-visible for all interactive elements (WCAG 2.1 AA) */
+.nav-link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: var(--radius-xs);
+}
+
+.gallery-filter-btn:focus-visible,
+.gallery-zoom-btn:focus-visible,
+.gallery-video-sound-btn:focus-visible,
+.gallery-video-play-indicator:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(212, 168, 83, 0.2);
+}
+
+.nav-toggle:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+}
+
+.social-link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.service-item-luxury:focus-visible,
+.feature-card-luxury:focus-visible,
+.project-card-compact:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    box-shadow: var(--shadow-glow);
+}
+
+.back-to-top:focus-visible,
+.chatbot-trigger:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: none;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.12);
+}
+
+/* Performance: will-change for frequently animated elements */
+.hero-bg-video {
+    will-change: transform;
+}
+
+.navbar {
+    will-change: background-color, padding;
+}
+
+.gallery-item {
+    will-change: transform;
+}
+
+.nav-links {
+    will-change: right;
+}
+
+/* Remove will-change when not needed (saves memory on mobile) */
+@media (hover: none) {
+    .gallery-item,
+    .hero-bg-video {
+        will-change: auto;
+    }
+}
+
 .sr-only {
     position: absolute;
     width: 1px;

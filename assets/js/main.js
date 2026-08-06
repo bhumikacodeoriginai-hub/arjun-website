@@ -348,15 +348,40 @@ function initContactForm() {
         }
         if (!valid) { setTimeout(() => form.querySelectorAll('.error').forEach(f => f.classList.remove('error')), 2500); return; }
 
+        // Gather form data
+        const name = (form.querySelector('#name') || {}).value || '';
+        const phoneVal = (form.querySelector('#phone') || {}).value || '';
+        const company = (form.querySelector('#company') || {}).value || '';
+        const location = (form.querySelector('#location') || {}).value || '';
+        const service = (form.querySelector('#service') || {}).value || '';
+        const message = (form.querySelector('#message') || {}).value || '';
+
+        // Build WhatsApp message
+        let waMsg = 'Hi, I would like to inquire about Arjun Realty services.\n\n';
+        waMsg += '--- New Inquiry ---\n';
+        if (name) waMsg += 'Name: ' + name + '\n';
+        if (phoneVal) waMsg += 'Phone: ' + phoneVal + '\n';
+        if (company) waMsg += 'Company: ' + company + '\n';
+        if (location) waMsg += 'Location: ' + location + '\n';
+        if (service) waMsg += 'Service: ' + service + '\n';
+        if (message) waMsg += 'Message: ' + message + '\n';
+
+        // Show sending state
         const btn = form.querySelector('button[type="submit"]');
         const orig = btn.innerHTML;
-        btn.innerHTML = '<span>Sending...</span>';
+        btn.innerHTML = '<span>Opening WhatsApp...</span>';
         btn.disabled = true;
+
+        // Open WhatsApp with the message
+        const waURL = 'https://wa.me/971581804241?text=' + encodeURIComponent(waMsg);
+        window.open(waURL, '_blank', 'noopener,noreferrer');
+
+        // Show success state
         setTimeout(() => {
-            btn.innerHTML = '<span>&#10003; Request Sent!</span>';
+            btn.innerHTML = '<span>&#10003; Sent to WhatsApp!</span>';
             btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.disabled = false; form.reset(); }, 3000);
-        }, 1200);
+        }, 800);
     });
 }
 
