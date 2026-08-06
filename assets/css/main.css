@@ -343,6 +343,10 @@ ul, ol { list-style: none; }
     padding: 0.8rem 0;
 }
 
+.navbar.scrolled .nav-logo-img {
+    height: 40px;
+}
+
 .nav-container {
     max-width: 1440px;
     margin: 0 auto;
@@ -354,9 +358,22 @@ ul, ol { list-style: none; }
 
 .nav-logo {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     line-height: 1;
     gap: 2px;
+}
+
+.nav-logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.nav-logo:hover .nav-logo-img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 .logo-text {
@@ -2149,10 +2166,23 @@ ul, ol { list-style: none; }
 
 .footer-logo {
     display: inline-flex;
-    flex-direction: column;
+    align-items: center;
     line-height: 1;
     margin-bottom: 1.2rem;
     gap: 2px;
+}
+
+.footer-logo-img {
+    height: 70px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.footer-logo:hover .footer-logo-img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 .footer-desc {
@@ -2538,6 +2568,12 @@ ul, ol { list-style: none; }
 }
 
 @media (max-width: 1024px) {
+    .nav-logo-img {
+        height: 44px;
+    }
+    .footer-logo-img {
+        height: 60px;
+    }
     .about-editorial-grid {
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
@@ -2614,6 +2650,14 @@ ul, ol { list-style: none; }
     .nav-links.active { right: 0; }
     .nav-toggle { display: flex; }
     .nav-actions .nav-cta-btn { display: none; }
+    
+    /* Logo responsive - mobile */
+    .nav-logo-img {
+        height: 40px;
+    }
+    .footer-logo-img {
+        height: 56px;
+    }
     
     /* Language toggle visible on mobile - move inside nav */
     .nav-actions .nav-lang-toggle {
@@ -2784,6 +2828,12 @@ ul, ol { list-style: none; }
 @media (max-width: 480px) {
     .hero-title {
         font-size: 2.8rem;
+    }
+    .nav-logo-img {
+        height: 34px;
+    }
+    .footer-logo-img {
+        height: 48px;
     }
     .hero-ctas {
         flex-direction: column;
