@@ -433,7 +433,15 @@ function initChatbot() {
     function addMsg(text, who) {
         const d = document.createElement('div');
         d.className = 'chat-message ' + who;
-        d.innerHTML = '<p>' + text + '</p>';
+        if (who === 'user') {
+            // Escape user input to prevent XSS
+            const p = document.createElement('p');
+            p.textContent = text;
+            d.appendChild(p);
+        } else {
+            // Bot messages contain safe HTML (links, formatting)
+            d.innerHTML = '<p>' + text + '</p>';
+        }
         messages.appendChild(d);
         messages.scrollTop = messages.scrollHeight;
     }
